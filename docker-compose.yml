@@ -13,12 +13,13 @@ services:
     networks:
       - nginx-proxy
     volumes:
-      - certs:/etc/nginx/certs
-      - dhparam:/etc/nginx/dhparam
-      - vhost:/etc/nginx/vhost.d
+      - ./conf:/etc/nginx/conf.d
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - ./dhparam:/etc/nginx/dhparam
+      - ./certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      # acme-companion
-      - html:/usr/share/nginx/html
+
   acme-companion:
     image: nginxproxy/acme-companion
     container_name: nginx-proxy-acme-companion
@@ -34,17 +35,10 @@ services:
       - nginx-proxy
 
 networks:
-  nginx-proxy:
+  default:
+    external: true
     name: nginx-proxy
 
 volumes:
-  certs:
-    name: nginx-proxy-certs
-  dhparam:
-    name: nginx-proxy-dhparam
-  vhost:
-    name: nginx-proxy-vhost
-  html:
-    name: nginx-proxy-acme-companion-html
   acme:
     name: nginx-proxy-acme-companion-acme
