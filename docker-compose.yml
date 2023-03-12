@@ -5,19 +5,16 @@ services:
     image: nginxproxy/nginx-proxy
     container_name: nginx-proxy
     restart: always
-    environment:
-      DHPARAM_GENERATION: 'false'
     ports:
-      - 80:80
-      - 443:443
+      - '80:80'
+      - '443:443'
     networks:
       - nginx-proxy
     volumes:
-      - ./conf:/etc/nginx/conf.d
-      - ./vhost:/etc/nginx/vhost.d
-      - ./html:/usr/share/nginx/html
-      - ./dhparam:/etc/nginx/dhparam
-      - ./certs:/etc/nginx/certs:ro
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
   acme-companion:
@@ -31,14 +28,32 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
+    environment:
+      DEFAULT_EMAIL: you@example.com
     volumes_from:
       - nginx-proxy
+  # whoami:
+  #   image: jwilder/whoami
+  #   container_name: whoami
+  #   expose:
+  #       - "8000"
+  #   environment:
+  #       - VIRTUAL_HOST=example.com
+  #       - VIRTUAL_PORT=8000
+  #       - LETSENCRYPT_HOST=example.com
+  #       - LETSENCRYPT_EMAIL=example@example.com
+  #   network_mode: bridge
+  #   networks:
+  #       - nginx-proxy
+
 
 networks:
-  default:
+  nginx-proxy:
     external: true
-    name: nginx-proxy
 
 volumes:
+  conf:
+  vhost:
+  html:
+  certs:
   acme:
-    name: nginx-proxy-acme-companion-acme
